@@ -59,7 +59,10 @@ export type ProjectOfficeErrorCode =
   | "RATE_LIMITED"
   | "PROVIDER_TIMEOUT"
   | "PROVIDER_ERROR"
-  | "INVALID_PROVIDER_RESPONSE"
+  | "EMPTY_MODEL_OUTPUT"
+  | "MODEL_REFUSAL"
+  | "INCOMPLETE_MODEL_OUTPUT"
+  | "INVALID_STRUCTURED_OUTPUT"
   | "INTERNAL_ERROR";
 
 export class ProjectOfficeError extends Error {

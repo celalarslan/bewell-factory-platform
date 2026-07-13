@@ -110,7 +110,7 @@ export function validateProjectOfficeRequest(value: unknown): ProjectOfficeReque
 function validateStringArray(value: unknown, field: string): string[] {
   if (!Array.isArray(value) || value.length > LIMITS.resultList) {
     throw new ProjectOfficeError(
-      "INVALID_PROVIDER_RESPONSE",
+      "INVALID_STRUCTURED_OUTPUT",
       `The AI provider returned an invalid ${field} section.`,
       502,
     );
@@ -125,7 +125,7 @@ function validateStringArray(value: unknown, field: string): string[] {
     )
   ) {
     throw new ProjectOfficeError(
-      "INVALID_PROVIDER_RESPONSE",
+      "INVALID_STRUCTURED_OUTPUT",
       `The AI provider returned an invalid ${field} section.`,
       502,
     );
@@ -137,7 +137,7 @@ function validateStringArray(value: unknown, field: string): string[] {
 export function validateSpecialistResult(value: unknown): SpecialistResult {
   if (!isRecord(value)) {
     throw new ProjectOfficeError(
-      "INVALID_PROVIDER_RESPONSE",
+      "INVALID_STRUCTURED_OUTPUT",
       "The AI provider returned an invalid structured response.",
       502,
     );
@@ -155,63 +155,98 @@ export function validateSpecialistResult(value: unknown): SpecialistResult {
   ];
   if (
     Object.keys(value).some((key) => !expectedFields.includes(key)) ||
-    expectedFields.some((key) => !(key in value))
+    expectedFields.some(
+      (key) =>
+        !(key in value) &&
+        ![
+          "analysis",
+          "assumptions",
+          "missingEvidence",
+          "risks",
+          "recommendations",
+          "proposedNextActions",
+        ].includes(key),
+    )
   ) {
     throw new ProjectOfficeError(
-      "INVALID_PROVIDER_RESPONSE",
+      "INVALID_STRUCTURED_OUTPUT",
       "The AI provider returned an unexpected response shape.",
       502,
     );
   }
 
+  const decisionRequired =
+    typeof value.decisionRequired === "string" &&
+    ["true", "false"].includes(value.decisionRequired.trim().toLowerCase())
+      ? value.decisionRequired.trim().toLowerCase() === "true"
+      : value.decisionRequired;
+
   if (
     typeof value.summary !== "string" ||
-    value.summary.length === 0 ||
+    value.summary.trim().length === 0 ||
     value.summary.length > LIMITS.resultString ||
-    typeof value.decisionRequired !== "boolean" ||
-    !Array.isArray(value.risks) ||
-    value.risks.length > LIMITS.resultList
+    typeof decisionRequired !== "boolean"
   ) {
     throw new ProjectOfficeError(
-      "INVALID_PROVIDER_RESPONSE",
+      "INVALID_STRUCTURED_OUTPUT",
       "The AI provider returned invalid result fields.",
       502,
     );
   }
 
-  const risks = value.risks.map((risk) => {
+  const rawRisks = value.risks ?? [];
+  if (!Array.isArray(rawRisks) || rawRisks.length > LIMITS.resultList) {
+    throw new ProjectOfficeError(
+      "INVALID_STRUCTURED_OUTPUT",
+      "The AI provider returned an invalid risks section.",
+      502,
+    );
+  }
+
+  const risks = rawRisks.map((risk) => {
+    const normalizedLevel =
+      isRecord(risk) && typeof risk.level === "string"
+        ? risk.level.toLowerCase()
+        : null;
+
     if (
       !isRecord(risk) ||
       Object.keys(risk).some((key) => !["level", "description"].includes(key)) ||
-      typeof risk.level !== "string" ||
-      !RISK_LEVELS.has(risk.level as RiskLevel) ||
+      !normalizedLevel ||
+      !RISK_LEVELS.has(normalizedLevel as RiskLevel) ||
       typeof risk.description !== "string" ||
       risk.description.length === 0 ||
       risk.description.length > LIMITS.resultString
     ) {
       throw new ProjectOfficeError(
-        "INVALID_PROVIDER_RESPONSE",
+        "INVALID_STRUCTURED_OUTPUT",
         "The AI provider returned an invalid risk item.",
         502,
       );
     }
 
     return {
-      level: risk.level as RiskLevel,
+      level: normalizedLevel as RiskLevel,
       description: risk.description,
     };
   });
 
   return {
     summary: value.summary,
-    analysis: validateStringArray(value.analysis, "analysis"),
-    assumptions: validateStringArray(value.assumptions, "assumptions"),
-    missingEvidence: validateStringArray(value.missingEvidence, "missingEvidence"),
+    analysis: validateStringArray(value.analysis ?? [], "analysis"),
+    assumptions: validateStringArray(value.assumptions ?? [], "assumptions"),
+    missingEvidence: validateStringArray(
+      value.missingEvidence ?? [],
+      "missingEvidence",
+    ),
     risks,
-    recommendations: validateStringArray(value.recommendations, "recommendations"),
-    decisionRequired: value.decisionRequired,
+    recommendations: validateStringArray(
+      value.recommendations ?? [],
+      "recommendations",
+    ),
+    decisionRequired,
     proposedNextActions: validateStringArray(
-      value.proposedNextActions,
+      value.proposedNextActions ?? [],
       "proposedNextActions",
     ),
   };
