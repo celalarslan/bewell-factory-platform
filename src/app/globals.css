@@ -1,15 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  --background: #07100d;
-  --foreground: #eef5ef;
+  --background: #080b0f;
+  --foreground: #f5f3f0;
+  --charcoal-black: #111418;
+  --deep-black: #080b0f;
+  --industrial-red: #b21f24;
+  --steel-gray: #6b7178;
+  --warm-stone: #d6d2cb;
+  --off-white: #f5f3f0;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
+  --font-sans: "Avenir Next", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 }
 
 * {
@@ -25,7 +31,9 @@ body {
   margin: 0;
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 button,
@@ -46,14 +54,14 @@ button {
   font-weight: 650;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #86c7a7;
+  color: #d9d0c7;
 }
 
 .eyebrow::before {
   content: "";
   width: 1.75rem;
   height: 1px;
-  background: linear-gradient(90deg, #86c7a7, transparent);
+  background: linear-gradient(90deg, #b21f24, transparent);
 }
 
 .config-label {
@@ -62,34 +70,47 @@ button {
   font-weight: 650;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #819187;
+  color: #a6aca8;
 }
 
 .industrial-grid {
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-  background-size: 44px 44px;
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 48px 48px;
   mask-image: linear-gradient(to bottom, black, transparent 85%);
-}
-
-.factory-floor {
-  background-image:
-    radial-gradient(circle at 22% 26%, rgba(225, 194, 114, 0.12), transparent 22%),
-    radial-gradient(circle at 76% 70%, rgba(99, 199, 153, 0.12), transparent 28%),
-    linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px);
-  background-size: auto, auto, 22px 22px, 22px 22px;
-  transform: perspective(700px) rotateX(55deg) scale(1.5) translateY(7%);
-  transform-origin: center bottom;
 }
 
 select option {
   color: white;
 }
 
+::selection {
+  background: rgba(178, 31, 36, 0.35);
+  color: var(--off-white);
+}
+
+img {
+  max-width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 @media (max-width: 640px) {
-  .factory-floor {
-    transform: perspective(700px) rotateX(55deg) scale(1.7) translateY(12%);
+  .industrial-grid {
+    background-size: 36px 36px;
   }
 }

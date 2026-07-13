@@ -28,31 +28,96 @@ Status: Verified from the current codebase.
 |-- package-lock.json
 |-- package.json
 |-- postcss.config.mjs
-|-- src
-|   |-- app
-|   |   |-- favicon.ico
-|   |   |-- globals.css
-|   |   |-- layout.tsx
-|   |   `-- page.tsx
-|   `-- components
-|       `-- ai-company-os.tsx
-`-- public
-    |-- file.svg
-    |-- globe.svg
-    |-- next.svg
-    |-- vercel.svg
-    `-- window.svg
+|-- public
+|   `-- assets
+|       |-- brand
+|       |   |-- Adsız.png
+|       |   |-- novertra-favicon.png
+|       |   |-- novertra-logo-final.png
+|       |   |-- novertra-logo-dark.png
+|       |   |-- novertra-logo-light.png
+|       |   `-- novertra-mark.png
+|       |-- hero
+|       |   `-- novertra-industrial-hero.png
+|       |-- raw
+|       |   |-- ChatGPT Image 12 Tem 2026 13_20_01 (1).png
+|       |   |-- ChatGPT Image 12 Tem 2026 13_20_02 (2).png
+|       |   |-- ChatGPT Image 12 Tem 2026 13_20_02 (3).png
+|       |   |-- ChatGPT Image 12 Tem 2026 13_20_03 (4).png
+|       |   |-- ChatGPT Image 12 Tem 2026 13_20_03 (5).png
+|       |   |-- ChatGPT Image 12 Tem 2026 13_20_04 (6).png
+|       |   |-- ChatGPT Image 12 Tem 2026 13_20_04 (7).png
+|       |   |-- ChatGPT Image 12 Tem 2026 13_20_05 (8).png
+|       |   |-- ChatGPT Image 12 Tem 2026 13_20_05 (9).png
+|       |   `-- nov-logo.png
+|       |-- optimized
+|       |   |-- novertra-industrial-hero.webp
+|       |   `-- nine verified sector WebP derivatives
+|       `-- sectors
+|           |-- agro-industry.png
+|           |-- energy.png
+|           |-- food-processing-cold-chain.png
+|           |-- industrial-manufacturing.png
+|           |-- infrastructure.png
+|           |-- mining-processing.png
+|           |-- poultry-production-processing.png
+|           |-- strategic-facilities.png
+|           `-- textile-manufacturing.png
+`-- src
+    |-- app
+    |   |-- configure
+    |   |   `-- page.tsx
+|   |-- globals.css
+|   |-- layout.tsx
+|   |-- page.tsx
+|   `-- project-office
+    |       `-- page.tsx
+    |-- components
+    |   |-- ai-company-os.tsx
+    |   |-- configurator
+    |   |   `-- factory-configurator.tsx
+    |   |-- home
+    |   |   |-- capabilities-section.tsx
+    |   |   |-- delivery-model.tsx
+    |   |   |-- experience-section.tsx
+    |   |   |-- hero-section.tsx
+    |   |   |-- industries-showcase.tsx
+    |   |   |-- start-project-section.tsx
+    |   |   |-- supply-network.tsx
+    |   |   |-- technology-intelligence.tsx
+    |   |   `-- trust-strip.tsx
+    |   |-- layout
+    |   |   |-- site-footer.tsx
+    |   |   `-- site-header.tsx
+    |   `-- ui
+    |       |-- reveal.tsx
+    |       `-- section-heading.tsx
+    `-- data
+        |-- configurator.ts
+        `-- home.ts
 ```
 
 ## 3. Current pages and routes
 
-- `/` - single App Router page defined in `src/app/page.tsx`.
-- No other app routes were found in `src/app`.
+- `/` - corporate public home page.
+- `/configure` - factory configurator.
+- `/project-office` - internal project office demo.
 
 ## 4. Current components
 
+- `src/components/layout/site-header.tsx`
+- `src/components/layout/site-footer.tsx`
+- `src/components/home/hero-section.tsx`
+- `src/components/home/trust-strip.tsx`
+- `src/components/home/capabilities-section.tsx`
+- `src/components/home/industries-showcase.tsx`
+- `src/components/home/delivery-model.tsx`
+- `src/components/home/experience-section.tsx`
+- `src/components/home/supply-network.tsx`
+- `src/components/home/technology-intelligence.tsx`
+- `src/components/home/start-project-section.tsx`
+- `src/components/configurator/factory-configurator.tsx`
 - `src/components/ai-company-os.tsx`
-- The `Home` component in `src/app/page.tsx` is the main page component.
 
 ## 5. API/backend
 
@@ -77,17 +142,19 @@ Status: Verified from the current codebase.
 
 ## 10. Working features
 
-- Premium public landing page.
-- Modular factory catalogue.
-- Interactive project configurator.
-- Estimate cards for investment, land, delivery timing, jobs, and readiness.
-- Interactive AI Project Office section with agent tabs and decision actions.
+- Corporate Novertra home page.
+- Interactive 13-sector showcase.
+- Factory configurator route with indicative calculations.
+- Internal Project Office demo route.
+- Frontend-only project inquiry form with validation state.
 - Responsive navigation with mobile menu.
 
 ## 11. Partial or broken features
 
-- Doğrulanamadı: no explicit broken feature was verified in the source.
-- The UI uses indicative demo values rather than connected business data.
+- Four sector entries do not have matching source images in the repository and are rendered with neutral visual treatment: Cattle & Beef Processing, Small Factories & Industrial Parks, Tractor Assembly, and Agricultural Equipment Manufacturing.
+- The inquiry form is frontend-only and does not submit to a backend.
+- The Project Office is a demo environment, not a live operational system.
+- The configurator produces indicative, preliminary results and does not create a real project record.
 
 ## 12. Current tests
 
@@ -103,15 +170,20 @@ Status: Verified from the current codebase.
 
 ## 14. Deployment files
 
-- `next.config.ts` sets `output: "export"`.
+- `next.config.ts` uses `output: "export"`.
+- `next.config.ts` also sets `images.unoptimized = true`.
+- `next.config.ts` explicitly sets the Turbopack root to this repository.
+- Root metadata uses `https://novertra.com` as `metadataBase`.
 - No `vercel.json` or other deployment-specific config file was found.
+- The current frontend is suitable for a Vercel preview after the documented asset gap is accepted or resolved.
 
 ## 15. Technical risks
 
 - No automated test suite was found.
 - Business values are hard-coded demo inputs.
-- The project currently appears to be a front-end only prototype.
+- The project still has no backend, auth or database.
 - Static export mode may constrain future server-side features.
+- Four sector assets are not present and remain unverified and not image-backed.
 
 ## 16. Product questions not answered by code
 
@@ -121,4 +193,3 @@ Status: Verified from the current codebase.
 - Whether authentication is required for client access.
 - Whether a backend, CRM, or database will be introduced.
 - Which external suppliers or data sources are authoritative.
-

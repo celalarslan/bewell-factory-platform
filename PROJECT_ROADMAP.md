@@ -14,3 +14,28 @@ Until this document is finalized:
 - Do not perform broad refactors.
 - Preserve existing working behavior.
 
+## Decision Log
+
+Decision:
+The primary product and platform brand is set to Novertra Industrial.
+
+Reason:
+To preserve Bewell Global as the legal and historical project context while establishing an independent industrial brand that can carry manufacturing, energy, agro-industry, mining, manufacturing and strategic facilities work at international scale.
+
+Impact:
+UI/UX, website content, logo, assets, metadata, route naming and public positioning.
+
+Status:
+APPROVED
+
+Date:
+2026-07-12
+
+Decision:
+Public website and demonstration interfaces were finalized under the NOVERTRA visual and governance language.
+
+Status:
+APPROVED
+
+Date:
+2026-07-12

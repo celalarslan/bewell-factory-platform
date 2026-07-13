@@ -61,8 +61,8 @@ type Decision = {
 const agents: Agent[] = [
   {
     id: "chief",
-    name: "Chief of Staff",
-    role: "Orchestrator Agent",
+    name: "Project Coordination",
+    role: "Coordination Function",
     icon: BrainCircuit,
     status: "active",
     confidence: 93,
@@ -74,8 +74,8 @@ const agents: Agent[] = [
   },
   {
     id: "technical",
-    name: "Technical Director",
-    role: "Process Engineering Agent",
+    name: "Technical Review",
+    role: "Technical Review Function",
     icon: Settings2,
     status: "active",
     confidence: 86,
@@ -88,7 +88,7 @@ const agents: Agent[] = [
   {
     id: "pmo",
     name: "Project Manager",
-    role: "PMO Agent",
+    role: "PMO Function",
     icon: Workflow,
     status: "active",
     confidence: 91,
@@ -101,7 +101,7 @@ const agents: Agent[] = [
   {
     id: "procurement",
     name: "Supplier Manager",
-    role: "Procurement Agent",
+    role: "Procurement Function",
     icon: SearchCheck,
     status: "review",
     confidence: 82,
@@ -114,7 +114,7 @@ const agents: Agent[] = [
   {
     id: "finance",
     name: "Finance Structuring",
-    role: "Investment Agent",
+    role: "Investment Function",
     icon: HandCoins,
     status: "waiting",
     confidence: 74,
@@ -127,7 +127,7 @@ const agents: Agent[] = [
   {
     id: "legal",
     name: "Contract & Compliance",
-    role: "Legal Risk Agent",
+    role: "Legal Risk Function",
     icon: Scale,
     status: "review",
     confidence: 88,
@@ -139,8 +139,8 @@ const agents: Agent[] = [
   },
   {
     id: "cost",
-    name: "Proposal & Cost",
-    role: "Cost Engineering Agent",
+    name: "Cost Engineering",
+    role: "Cost Engineering Function",
     icon: Calculator,
     status: "active",
     confidence: 84,
@@ -152,8 +152,8 @@ const agents: Agent[] = [
   },
   {
     id: "crm",
-    name: "Digital Operations",
-    role: "CRM & Data Agent",
+    name: "Commercial Intelligence",
+    role: "Commercial Intelligence Function",
     icon: Database,
     status: "active",
     confidence: 96,
@@ -166,13 +166,13 @@ const agents: Agent[] = [
   {
     id: "redteam",
     name: "Independent Review",
-    role: "Red Team Agent",
+    role: "Independent Review Function",
     icon: ShieldAlert,
     status: "review",
     confidence: 90,
     task: "Testing downside assumptions and hidden exclusions",
     output: "Contradictions, failure cases & stop conditions",
-    authority: "Challenge every agent output independently",
+    authority: "Challenge every specialist output independently",
     blocked: "Cannot modify original analysis or approve work",
     specialty: ["Adversarial review", "Evidence audit", "Failure testing"],
   },
@@ -222,10 +222,10 @@ const dossierItems = [
 ] as const;
 
 const activity = [
-  ["CRM Agent", "Qualified a new dairy-processing lead from Uganda", "8 min"],
-  ["Technical Director", "Raised transformer load inconsistency", "24 min"],
-  ["Cost Agent", "Added marine insurance exclusion to cost model", "41 min"],
-  ["Red Team", "Flagged unsupported feedstock-growth assumption", "1 hr"],
+  ["Commercial Intelligence", "Qualified a new dairy-processing lead from Uganda", "8 min"],
+  ["Technical Review", "Raised transformer load inconsistency", "24 min"],
+  ["Cost Engineering", "Added marine insurance exclusion to cost model", "41 min"],
+  ["Independent Review", "Flagged unsupported feedstock-growth assumption", "1 hr"],
 ];
 
 export default function AICompanyOS() {
@@ -245,13 +245,17 @@ export default function AICompanyOS() {
   };
 
   return (
-    <section id="ai-office" className="border-y border-white/8 bg-[#08120e] py-24">
+    <section id="project-office" className="border-y border-white/10 bg-[#08120e] py-24">
       <div className="mx-auto max-w-[1440px] px-5 lg:px-10">
+        <div className="mb-8 rounded-[24px] border border-[#b21f24]/22 bg-[#b21f24]/8 p-5 text-sm leading-7 text-[#f3e8e8]">
+          INTERNAL PROJECT OFFICE — DEMONSTRATION ENVIRONMENT. External commercial and contractual commitments require executive approval.
+        </div>
+
         <div className="mb-12 grid gap-8 lg:grid-cols-[1fr_.72fr] lg:items-end">
           <div>
-            <div className="eyebrow">AI Company Operating System</div>
+            <div className="eyebrow">Integrated Project Governance</div>
             <h2 className="mt-4 max-w-5xl text-4xl font-semibold tracking-[-0.04em] text-white md:text-6xl">
-              One human decision-maker. A complete specialist AI project office.
+              A structured project office for evidence-led industrial decisions.
             </h2>
           </div>
           <div className="rounded-[24px] border border-[#d9bc70]/18 bg-[#d9bc70]/6 p-5">
@@ -260,30 +264,30 @@ export default function AICompanyOS() {
                 <UserRoundCheck className="h-5 w-5" />
               </div>
               <div>
-                <div className="text-xs uppercase tracking-[0.18em] text-[#9a895e]">Final authority</div>
+                <div className="text-xs uppercase tracking-[0.18em] text-[#9a895e]">Executive approval</div>
                 <div className="mt-1 font-semibold text-white">Celal Arslan · Platform President</div>
               </div>
             </div>
             <p className="mt-4 text-sm leading-6 text-[#9eada3]">
-              AI agents analyse, challenge and prepare. External commitments, investment, pricing and contracts remain under Celal Arslan&apos;s explicit approval.
+              Specialist functions analyse, review and prepare recommendations. External commitments, investment decisions, pricing and contracts require executive approval.
             </p>
           </div>
         </div>
 
         <div className="overflow-hidden rounded-[34px] border border-white/10 bg-[#06100c] shadow-2xl shadow-black/35">
           <div className="flex flex-col gap-4 border-b border-white/8 px-5 py-5 md:flex-row md:items-center md:justify-between md:px-7">
-            <div className="flex items-center gap-3">
-              <div className="grid h-11 w-11 place-items-center rounded-2xl border border-[#7ad1aa]/20 bg-[#7ad1aa]/8 text-[#88d9b5]">
-                <Network className="h-5 w-5" />
+              <div className="flex items-center gap-3">
+                <div className="grid h-11 w-11 place-items-center rounded-2xl border border-[#7ad1aa]/20 bg-[#7ad1aa]/8 text-[#88d9b5]">
+                  <Network className="h-5 w-5" />
+                </div>
+                <div>
+                <div className="text-sm font-semibold text-white">Novertra Project Office</div>
+                <div className="mt-1 text-[10px] uppercase tracking-[0.2em] text-[#66796d]">Controlled workflow · Evidence required</div>
+                </div>
               </div>
-              <div>
-                <div className="text-sm font-semibold text-white">Bewell AI Project Office</div>
-                <div className="mt-1 text-[10px] uppercase tracking-[0.2em] text-[#66796d]">Controlled autonomy · Evidence required</div>
-              </div>
-            </div>
             <div className="flex flex-wrap gap-2">
               <span className="rounded-full border border-[#74cba2]/18 bg-[#74cba2]/8 px-3 py-1.5 text-[10px] font-medium text-[#8bd9b8]">
-                7 agents working
+                7 workstreams active
               </span>
               <span className="rounded-full border border-[#d9bc70]/18 bg-[#d9bc70]/7 px-3 py-1.5 text-[10px] font-medium text-[#dcc57f]">
                 {pendingDecisions} decisions pending
@@ -296,7 +300,7 @@ export default function AICompanyOS() {
               <div className="grid grid-cols-2 gap-2 lg:grid-cols-1">
                 {[
                   ["command", Gauge, "Command Center"],
-                  ["team", Bot, "AI Team"],
+                  ["team", Bot, "Specialist Functions"],
                   ["decisions", ClipboardCheck, "Decision Queue"],
                   ["dossier", Database, "Project Dossier"],
                 ].map(([id, Icon, label]) => {
@@ -319,11 +323,11 @@ export default function AICompanyOS() {
               </div>
 
               <div className="mt-5 hidden rounded-2xl border border-white/8 bg-black/10 p-4 lg:block">
-                <div className="text-[10px] uppercase tracking-[0.18em] text-[#687a6f]">Authority model</div>
+                <div className="text-[10px] uppercase tracking-[0.18em] text-[#687a6f]">Governance model</div>
                 <div className="mt-3 space-y-3 text-xs text-[#93a39a]">
-                  <div className="flex items-start gap-2"><Check className="mt-0.5 h-3.5 w-3.5 text-[#76cba3]" /> Draft and analyse</div>
-                  <div className="flex items-start gap-2"><Eye className="mt-0.5 h-3.5 w-3.5 text-[#d9bd72]" /> Human review required</div>
-                  <div className="flex items-start gap-2"><XCircle className="mt-0.5 h-3.5 w-3.5 text-[#d47d72]" /> No autonomous commitment</div>
+                  <div className="flex items-start gap-2"><Check className="mt-0.5 h-3.5 w-3.5 text-[#76cba3]" /> Prepare and analyse</div>
+                  <div className="flex items-start gap-2"><Eye className="mt-0.5 h-3.5 w-3.5 text-[#d9bd72]" /> Executive review required</div>
+                  <div className="flex items-start gap-2"><XCircle className="mt-0.5 h-3.5 w-3.5 text-[#d47d72]" /> No external commitment without approval</div>
                 </div>
               </div>
             </aside>
@@ -333,9 +337,9 @@ export default function AICompanyOS() {
                 <div>
                   <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
                     <div>
-                      <div className="text-xs uppercase tracking-[0.2em] text-[#6d8074]">Executive overview</div>
-                      <h3 className="mt-2 text-2xl font-semibold text-white md:text-3xl">Good morning, Celal.</h3>
-                      <p className="mt-2 text-sm text-[#87998e]">Only exceptions, risks and decisions requiring your authority are surfaced here.</p>
+                    <div className="text-xs uppercase tracking-[0.2em] text-[#6d8074]">Executive overview</div>
+                    <h3 className="mt-2 text-2xl font-semibold text-white md:text-3xl">Good morning, Celal.</h3>
+                    <p className="mt-2 text-sm text-[#87998e]">Only exceptions, risks and decisions requiring your authority are surfaced here.</p>
                     </div>
                     <button onClick={() => setActiveTab("decisions")} className="inline-flex items-center gap-2 self-start rounded-full bg-[#e1c272] px-5 py-2.5 text-xs font-semibold text-[#09110d]">
                       Review {pendingDecisions} decisions <ArrowRight className="h-3.5 w-3.5" />
@@ -345,7 +349,7 @@ export default function AICompanyOS() {
                   <div className="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                     {[
                       ["12", "Active projects", BriefcaseBusiness, "3 at decision gate"],
-                      ["9", "Specialist agents", Bot, "All systems healthy"],
+                      ["9", "Specialist functions", Bot, "All systems healthy"],
                       [String(pendingDecisions), "Your decisions", ClipboardCheck, "2 commercially critical"],
                       ["$28.4M", "Qualified pipeline", CircleDollarSign, "+$4.6M this week"],
                     ].map(([value, label, Icon, note]) => {
@@ -369,7 +373,7 @@ export default function AICompanyOS() {
                       <div className="flex items-center justify-between">
                         <div>
                           <div className="text-sm font-semibold text-white">Decision priority</div>
-                          <div className="mt-1 text-[10px] uppercase tracking-[0.17em] text-[#687a6f]">Prepared by Chief of Staff + Red Team</div>
+                          <div className="mt-1 text-[10px] uppercase tracking-[0.17em] text-[#687a6f]">Prepared by Project Coordination + Independent Review</div>
                         </div>
                         <Target className="h-5 w-5 text-[#d9bd72]" />
                       </div>
@@ -395,7 +399,7 @@ export default function AICompanyOS() {
 
                     <div className="rounded-[24px] border border-white/8 bg-black/10 p-5 md:p-6">
                       <div className="flex items-center justify-between">
-                        <div className="text-sm font-semibold text-white">Agent activity</div>
+                        <div className="text-sm font-semibold text-white">Workstream activity</div>
                         <Activity className="h-4 w-4 text-[#79cba5]" />
                       </div>
                       <div className="mt-5 space-y-5">
@@ -419,10 +423,10 @@ export default function AICompanyOS() {
                 <div>
                   <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
                     <div>
-                      <div className="text-xs uppercase tracking-[0.2em] text-[#6d8074]">Specialist agent workforce</div>
+                      <div className="text-xs uppercase tracking-[0.2em] text-[#6d8074]">Specialist function workforce</div>
                       <h3 className="mt-2 text-2xl font-semibold text-white md:text-3xl">Nine roles. Explicit boundaries.</h3>
                     </div>
-                    <div className="text-xs text-[#718278]">Click an agent to inspect its charter and authority.</div>
+                    <div className="text-xs text-[#718278]">Click a function to inspect its charter and authority.</div>
                   </div>
 
                   <div className="mt-7 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -470,7 +474,7 @@ export default function AICompanyOS() {
               {activeTab === "decisions" && (
                 <div>
                   <div>
-                    <div className="text-xs uppercase tracking-[0.2em] text-[#6d8074]">Human approval gate</div>
+                    <div className="text-xs uppercase tracking-[0.2em] text-[#6d8074]">Executive approval gate</div>
                     <h3 className="mt-2 text-2xl font-semibold text-white md:text-3xl">Celal Arslan Decision Queue</h3>
                     <p className="mt-2 text-sm text-[#87998e]">Every external commitment stops here until you approve, reject or request evidence.</p>
                   </div>
@@ -499,7 +503,7 @@ export default function AICompanyOS() {
 
                         <div className="mt-5 grid gap-3 md:grid-cols-3">
                           <div className="rounded-2xl border border-white/7 bg-black/10 p-4">
-                            <div className="text-[9px] uppercase tracking-[0.16em] text-[#65776b]">Agent recommendation</div>
+                            <div className="text-[9px] uppercase tracking-[0.16em] text-[#65776b]">Function recommendation</div>
                             <div className="mt-2 text-sm font-medium text-white">{decision.recommendation}</div>
                           </div>
                           <div className="rounded-2xl border border-white/7 bg-black/10 p-4 md:col-span-2">
@@ -554,7 +558,7 @@ export default function AICompanyOS() {
                       <div className="flex items-center justify-between">
                         <div>
                           <div className="text-sm font-semibold text-white">Evidence register</div>
-                          <div className="mt-1 text-[10px] text-[#67796e]">Every agent reads and writes against the same structured record.</div>
+                          <div className="mt-1 text-[10px] text-[#67796e]">Every function reads and writes against the same structured record.</div>
                         </div>
                         <Database className="h-5 w-5 text-[#79cba5]" />
                       </div>
@@ -575,7 +579,7 @@ export default function AICompanyOS() {
 
                     <div className="space-y-5">
                       <div className="rounded-[24px] border border-white/8 bg-black/10 p-5 md:p-6">
-                        <div className="text-sm font-semibold text-white">Agent consensus</div>
+                        <div className="text-sm font-semibold text-white">Function consensus</div>
                         <div className="mt-5 space-y-4">
                           {[
                             ["Technical", "Conditionally feasible", 78],
