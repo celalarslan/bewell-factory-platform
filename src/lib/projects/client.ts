@@ -101,6 +101,11 @@ async function projectRequest(path: string, init?: RequestInit) {
     throw new Error("Yerel proje servisine ulaşılamıyor.");
   }
 
+  if (response.status === 401) {
+    window.location.assign("/admin/login?next=/project-office");
+    throw new Error("Yönetici oturumu sona erdi.");
+  }
+
   const payload: unknown = await response.json().catch(() => null);
   if (!response.ok || !isRecord(payload) || payload.ok !== true) {
     throw new Error(safeErrorMessage(payload));

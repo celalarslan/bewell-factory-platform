@@ -101,7 +101,8 @@ Status: Verified from the current codebase.
 
 - `/` - corporate public home page.
 - `/configure` - factory configurator.
-- `/project-office` - internal project office demo.
+- `/admin/login` - Project Office administrator login.
+- `/project-office` - authenticated internal project office.
 
 ## 4. Current components
 
@@ -121,15 +122,16 @@ Status: Verified from the current codebase.
 
 ## 5. API/backend
 
-- `/api/project-office` provides the local-only Project Office analysis backend.
-- `/api/projects` and `/api/projects/:id` provide local-development CRUD for the
-  `projects` table only.
+- `/api/admin/login` and `/api/admin/logout` manage the administrator session.
+- `/api/project-office` provides the authenticated Project Office analysis backend.
+- `/api/projects` and nested Project Dossier endpoints provide authenticated project,
+  analysis history, facts, assumptions, risks, evidence, and decision operations.
 - Project creation, update, and archival write an audit event in the same database
   transaction.
 - Project deletion is implemented as archival; no project delete endpoint issues a
   SQL `DELETE`.
-- Project APIs fail closed with `404` in production because authentication is not yet
-  available.
+- Project Office and all internal project APIs require a valid administrator session in
+  development and production.
 
 ## 6. Database
 
@@ -137,11 +139,20 @@ Status: Verified from the current codebase.
 - Drizzle provides the database client, schema, migration, and type layer.
 - The Project Dossier schema contains projects, facts, assumptions, evidence
   requirements, risks, executive decisions, analysis runs, and audit events.
-- Only the `projects` table and its audit events are currently connected to CRUD APIs.
+- Project Dossier tables are connected to authenticated APIs within their documented
+  safe update and soft-delete limits.
 
 ## 7. Auth
 
-- No authentication provider or auth flow was found.
+- A single environment-configured administrator account protects Project Office.
+- Login creates an HMAC-signed `HttpOnly`, `SameSite=Strict` session cookie with an
+  eight-hour expiry; production cookies are also `Secure`.
+- Logout invalidates the browser cookie; expired or modified tokens are rejected.
+- Missing or invalid admin environment configuration fails closed without affecting
+  public pages.
+- Login uses timing-safe credential checks, a fixed response delay, and an in-memory
+  eight-attempt/ten-minute limiter. The limiter is best-effort and not distributed
+  across serverless instances.
 
 ## 8. External services
 
@@ -151,25 +162,27 @@ Status: Verified from the current codebase.
 
 - `DATABASE_URL` configures the server-only PostgreSQL connection.
 - OpenAI credentials remain server-only; no `NEXT_PUBLIC_` credential is used.
+- `ADMIN_USERNAME`, `ADMIN_PASSWORD`, and `ADMIN_SESSION_SECRET` configure server-only
+  administrator authentication.
 
 ## 10. Working features
 
 - Corporate Novertra home page.
 - Interactive 13-sector showcase.
 - Factory configurator route with indicative calculations.
-- Internal Project Office demo route.
+- Authenticated internal Project Office route with login and logout.
 - Frontend-only project inquiry form with validation state.
 - Responsive navigation with mobile menu.
-- Local-only Project Dossier project CRUD with transactional audit events and archival.
+- Authenticated Project Dossier project CRUD with transactional audit events and archival.
 - Project Office UI project creation, listing, selection, update, and archival through
   the local Project Dossier API.
 - The active Project Dossier record is linked to Project Office AI tasks by project ID;
   the server validates the project and builds AI context from PostgreSQL.
 - Successful and failed AI analysis runs are stored in `analysis_runs`, and compact
   project-specific analysis history is shown in the local Project Office UI.
-- Project Dossier V2 provides local-only create, list, update, and safe terminal-state
+- Project Dossier V2 provides authenticated create, list, update, and safe terminal-state
   management for facts, assumptions, risks, and evidence requirements.
-- Executive decisions provide local-only create, list, and update operations; removal
+- Executive decisions provide authenticated create, list, and update operations; removal
   is disabled because the existing schema has no safe soft-delete field.
 - Every Project Dossier V2 write creates a transaction-bound audit event containing
   changed field names and a short safe summary.
@@ -180,12 +193,10 @@ Status: Verified from the current codebase.
 - The inquiry form is frontend-only and does not submit to a backend.
 - The Project Office is a demo environment, not a live operational system.
 - The configurator produces indicative, preliminary results and does not create a real project record.
-- Project Dossier V2 endpoints and UI remain local-only until production authentication
-  is implemented.
 - Analysis results do not automatically create facts, assumptions, risks, decisions,
   or evidence records.
-- Project Office and Project CRUD remain unavailable in production until authentication
-  exists, and archival is used instead of real deletion.
+- Administrator credentials remain environment-managed; there is no multi-user account
+  store, password recovery, MFA, or distributed brute-force limiter.
 
 ## 12. Current tests
 

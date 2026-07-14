@@ -2,7 +2,10 @@ import "server-only";
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { canAccessInternalProjectOffice } from "@/lib/ai/access";
+import {
+  assertSameOrigin as isSameOriginRequest,
+  getAdminSessionFromRequest,
+} from "@/lib/auth/admin-auth";
 
 const MAX_BODY_BYTES = 32 * 1024;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -36,6 +39,7 @@ type ProjectPatch = Partial<ProjectInput>;
 type ProjectApiErrorCode =
   | "VALIDATION_ERROR"
   | "NOT_FOUND"
+  | "UNAUTHORIZED"
   | "PROJECT_ARCHIVED"
   | "METHOD_NOT_SUPPORTED"
   | "DATABASE_UNAVAILABLE"
@@ -205,25 +209,17 @@ export function assertItemId(id: string) {
 }
 
 export function assertProjectApiAccess(request: NextRequest) {
-  if (!canAccessInternalProjectOffice(request.headers.get("host"))) {
-    throw new ProjectApiError("NOT_FOUND", "Not found.", 404);
+  if (!getAdminSessionFromRequest(request)) {
+    throw new ProjectApiError(
+      "UNAUTHORIZED",
+      "Bu işlem için yönetici oturumu gereklidir.",
+      401,
+    );
   }
 }
 
 export function assertSameOrigin(request: NextRequest) {
-  const origin = request.headers.get("origin");
-  const fetchSite = request.headers.get("sec-fetch-site");
-  let originMatches = true;
-
-  if (origin !== null) {
-    try {
-      originMatches = new URL(origin).origin === request.nextUrl.origin;
-    } catch {
-      originMatches = false;
-    }
-  }
-
-  if (fetchSite === "cross-site" || !originMatches) {
+  if (!isSameOriginRequest(request)) {
     throw new ProjectApiError("NOT_FOUND", "Not found.", 404);
   }
 }

@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 
 import { analysisRuns, projects } from "@/db/schema";
-import { canAccessInternalProjectOffice } from "@/lib/ai/access";
+import {
+  assertSameOrigin as isSameOriginRequest,
+  getAdminSessionFromRequest,
+} from "@/lib/auth/admin-auth";
 import { getOpenAIConfig } from "@/lib/ai/client";
 import { runProjectOffice } from "@/lib/ai/orchestrator";
 import { ProjectOfficeError } from "@/lib/ai/types";
@@ -27,19 +30,7 @@ function errorResponse(error: ProjectOfficeError) {
 }
 
 function assertSameOrigin(request: NextRequest) {
-  const origin = request.headers.get("origin");
-  const fetchSite = request.headers.get("sec-fetch-site");
-  let originMatches = true;
-
-  if (origin !== null) {
-    try {
-      originMatches = new URL(origin).origin === request.nextUrl.origin;
-    } catch {
-      originMatches = false;
-    }
-  }
-
-  if (fetchSite === "cross-site" || !originMatches) {
+  if (!isSameOriginRequest(request)) {
     throw new ProjectOfficeError(
       "INVALID_ORIGIN",
       "Cross-origin requests are not allowed.",
@@ -49,8 +40,12 @@ function assertSameOrigin(request: NextRequest) {
 }
 
 function assertInternalAccess(request: NextRequest) {
-  if (!canAccessInternalProjectOffice(request.headers.get("host"))) {
-    throw new ProjectOfficeError("NOT_FOUND", "Not found.", 404);
+  if (!getAdminSessionFromRequest(request)) {
+    throw new ProjectOfficeError(
+      "UNAUTHORIZED",
+      "Bu işlem için yönetici oturumu gereklidir.",
+      401,
+    );
   }
 }
 
@@ -114,7 +109,7 @@ function databaseFailure(message: string) {
   return new ProjectOfficeError("ANALYSIS_NOT_SAVED", message, 500);
 }
 
-// Demo/local endpoint only. Production use requires authentication and durable rate limiting.
+// Internal endpoint: every environment requires an authenticated admin session.
 export async function POST(request: NextRequest) {
   try {
     assertInternalAccess(request);

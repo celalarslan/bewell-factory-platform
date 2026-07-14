@@ -20,6 +20,7 @@ import {
   Gauge,
   HandCoins,
   LoaderCircle,
+  LogOut,
   Network,
   Play,
   Scale,
@@ -434,6 +435,10 @@ function SpecialistWorkspace({
           language,
         }),
       });
+      if (response.status === 401) {
+        window.location.assign("/admin/login?next=/project-office");
+        return;
+      }
       const payload: unknown = await response.json().catch(() => null);
 
       if (!response.ok || !isApiSuccess(payload)) {
@@ -702,12 +707,13 @@ function SpecialistWorkspace({
   );
 }
 
-export default function AICompanyOS() {
+export default function AICompanyOS({ adminUsername }: { adminUsername: string }) {
   const [activeTab, setActiveTab] = useState<"command" | "team" | "decisions" | "dossier">("command");
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [decisions, setDecisions] = useState<Decision[]>(initialDecisions);
   const [activeProject, setActiveProject] = useState<ProjectRecord | null>(null);
   const [historyVersion, setHistoryVersion] = useState(0);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   const pendingDecisions = useMemo(
     () => decisions.filter((decision) => decision.status === "pending").length,
@@ -718,6 +724,16 @@ export default function AICompanyOS() {
     setDecisions((current) =>
       current.map((decision) => (decision.id === id ? { ...decision, status } : decision)),
     );
+  };
+
+  const logout = async () => {
+    if (loggingOut) return;
+    setLoggingOut(true);
+    try {
+      await fetch("/api/admin/logout", { method: "POST" });
+    } finally {
+      window.location.assign("/admin/login");
+    }
   };
 
   return (
@@ -746,6 +762,18 @@ export default function AICompanyOS() {
             <p className="mt-3 text-xs leading-5 text-[#9eada3]">
               Harici ticari, finansal ve sözleşmesel taahhütler yönetici onayı gerektirir.
             </p>
+            <div className="mt-4 flex flex-col gap-2 border-t border-[#d9bc70]/12 pt-3 sm:flex-row sm:items-center sm:justify-between">
+              <span className="text-[10px] text-[#9eada3]">Yönetici: {adminUsername}</span>
+              <button
+                type="button"
+                onClick={() => void logout()}
+                disabled={loggingOut}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/10 px-3 text-[10px] font-medium text-[#c4cec8] transition hover:border-white/18 hover:text-white disabled:opacity-50"
+              >
+                {loggingOut ? <LoaderCircle className="h-3.5 w-3.5 animate-spin" /> : <LogOut className="h-3.5 w-3.5" />}
+                Çıkış Yap
+              </button>
+            </div>
           </div>
         </div>
 

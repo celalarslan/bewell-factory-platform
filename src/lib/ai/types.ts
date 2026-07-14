@@ -63,6 +63,7 @@ export interface SpecialistResult {
 export type ProjectOfficeErrorCode =
   | "INVALID_REQUEST"
   | "INVALID_ORIGIN"
+  | "UNAUTHORIZED"
   | "NOT_FOUND"
   | "PROJECT_NOT_FOUND"
   | "PROJECT_ARCHIVED"
