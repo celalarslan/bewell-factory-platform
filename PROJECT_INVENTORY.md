@@ -99,10 +99,15 @@ Status: Verified from the current codebase.
 
 ## 3. Current pages and routes
 
-- `/` - corporate public home page.
-- `/configure` - factory configurator.
+- `/` - redirects to the default English public home at `/en`.
+- `/configure` - redirects to the default English configurator at `/en/configure`.
+- `/en`, `/ar`, `/fr`, `/tr` - localized corporate public home pages.
+- `/en/configure`, `/ar/configure`, `/fr/configure`, `/tr/configure` - localized
+  industrial project configurators.
 - `/admin/login` - Project Office administrator login.
 - `/project-office` - authenticated internal project office.
+
+Public locale routing is isolated from admin, Project Office, and API routes.
 
 ## 4. Current components
 
@@ -167,9 +172,15 @@ Status: Verified from the current codebase.
 
 ## 10. Working features
 
-- Corporate Novertra home page.
-- Interactive 13-sector showcase.
-- Factory configurator route with indicative calculations.
+- English, Arabic, French, and Turkish public pages with localized URL paths.
+- Arabic public pages use RTL document direction and logical layout spacing.
+- The public header includes a desktop and mobile language switcher.
+- Localized canonical, `hreflang`, Open Graph, Twitter, sitemap, robots, FAQ,
+  Organization, WebSite, Service, and Breadcrumb structured data are available.
+- Corporate positioning presents Türkiye as the home and priority engineering base while
+  allowing qualified international supplier, technology, and specialist integration.
+- Interactive 13-sector showcase with real image assets for every sector.
+- Four-language industrial project configurator with indicative calculations.
 - Authenticated internal Project Office route with login and logout.
 - Frontend-only project inquiry form with validation state.
 - Responsive navigation with mobile menu.
@@ -189,7 +200,6 @@ Status: Verified from the current codebase.
 
 ## 11. Partial or broken features
 
-- Four sector entries do not have matching source images in the repository and are rendered with neutral visual treatment: Cattle & Beef Processing, Small Factories & Industrial Parks, Tractor Assembly, and Agricultural Equipment Manufacturing.
 - The inquiry form is frontend-only and does not submit to a backend.
 - The Project Office is a demo environment, not a live operational system.
 - The configurator produces indicative, preliminary results and does not create a real project record.
@@ -212,26 +222,24 @@ Status: Verified from the current codebase.
 
 ## 14. Deployment files
 
-- `next.config.ts` uses `output: "export"`.
-- `next.config.ts` also sets `images.unoptimized = true`.
+- `next.config.ts` sets `images.unoptimized = true`.
 - `next.config.ts` explicitly sets the Turbopack root to this repository.
 - Root metadata uses `https://novertra.com` as `metadataBase`.
 - No `vercel.json` or other deployment-specific config file was found.
-- The current frontend is suitable for a Vercel preview after the documented asset gap is accepted or resolved.
+- Production deployment has not been performed in this workspace.
 
 ## 15. Technical risks
 
 - No automated test suite was found.
 - Business values are hard-coded demo inputs.
-- The project still has no backend, auth or database.
-- Static export mode may constrain future server-side features.
-- Four sector assets are not present and remain unverified and not image-backed.
+- Admin authentication is environment-based and does not provide multi-user identity,
+  password recovery, MFA, or a distributed brute-force limiter.
+- Public inquiry submission remains intentionally disconnected from a backend.
 
 ## 16. Product questions not answered by code
 
 - Which countries are in scope first.
 - Which factory types are officially supported.
 - Whether estimates are advisory or proposal-binding.
-- Whether authentication is required for client access.
-- Whether a backend, CRM, or database will be introduced.
+- Whether public client accounts or CRM integration will be introduced.
 - Which external suppliers or data sources are authoritative.

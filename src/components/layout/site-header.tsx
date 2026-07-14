@@ -4,14 +4,37 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Menu, X } from "lucide-react";
-import { navigationLinks, secondaryLinks } from "@/data/home";
+import { getPublicContent } from "@/i18n/public-content";
+import {
+  localeLabels,
+  locales,
+  localizedPath,
+  type Locale,
+} from "@/i18n/locales";
 
 const sectionIds = ["capabilities", "industries", "delivery-model", "experience", "about", "insights", "start-project"];
 
-export default function SiteHeader() {
+export default function SiteHeader({
+  locale,
+  page = "home",
+}: {
+  locale?: Locale;
+  page?: "home" | "configure";
+}) {
+  const activeLocale = locale ?? "en";
+  const content = getPublicContent(activeLocale);
+  const basePath = localizedPath(activeLocale, "home");
+  const navigationLinks = [
+    { label: content.navigation.capabilities, href: `${basePath}#capabilities` },
+    { label: content.navigation.industries, href: `${basePath}#industries` },
+    { label: content.navigation.delivery, href: `${basePath}#delivery-model` },
+    { label: content.navigation.experience, href: `${basePath}#experience` },
+    { label: content.navigation.about, href: `${basePath}#about` },
+    { label: content.navigation.insights, href: `${basePath}#insights` },
+  ];
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [active, setActive] = useState("capabilities");
+  const [active, setActive] = useState(page === "home" ? "capabilities" : "");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -62,14 +85,14 @@ export default function SiteHeader() {
   return (
     <header className={headerClass}>
       <div className="mx-auto flex h-20 max-w-[1560px] items-center justify-between gap-6 px-5 xl:px-8 2xl:px-10">
-        <Link href="/#top" className="flex shrink-0 items-center overflow-visible">
+        <Link href={`${basePath}#top`} className="flex shrink-0 items-center overflow-visible">
           <Image
             src="/assets/brand/novertra-logo-final.png"
             alt="Novertra Industrial"
             width={800}
             height={200}
             sizes="(min-width: 1280px) 200px, (min-width: 640px) 170px, 160px"
-            className="block h-auto w-[160px] flex-shrink-0 object-contain object-left sm:w-[170px] xl:w-[200px]"
+            className="block h-auto w-[160px] flex-shrink-0 object-contain object-start sm:w-[170px] xl:w-[200px]"
             priority
           />
         </Link>
@@ -88,23 +111,37 @@ export default function SiteHeader() {
 
         <div className="hidden shrink-0 items-center gap-3 whitespace-nowrap xl:flex 2xl:gap-4">
           <div className="flex items-center gap-3 text-[11px] text-[#a7afa8] 2xl:text-[12px]">
-            {secondaryLinks.map((link) => (
-              <Link key={link.label} href={link.href} className="transition hover:text-white">
-                {link.label}
-              </Link>
-            ))}
+            <Link href={localizedPath(activeLocale, "configure")} className="transition hover:text-white">
+              {content.navigation.configurator}
+            </Link>
           </div>
+          {locale ? (
+            <div className="flex items-center gap-1" aria-label={content.navigation.language}>
+              {locales.map((item) => (
+                <Link
+                  key={item}
+                  href={localizedPath(item, page)}
+                  hrefLang={item}
+                  aria-current={item === activeLocale ? "page" : undefined}
+                  onClick={() => window.localStorage.setItem("novertra-locale", item)}
+                  className={`grid h-9 min-w-9 place-items-center rounded-lg text-[10px] font-semibold transition ${item === activeLocale ? "bg-white/10 text-white" : "text-[#879189] hover:text-white"}`}
+                >
+                  {localeLabels[item]}
+                </Link>
+              ))}
+            </div>
+          ) : null}
           <Link
-            href="/#start-project"
+            href={`${basePath}#start-project`}
             className="inline-flex min-h-11 items-center whitespace-nowrap rounded-xl border border-[#b21f24]/55 bg-[#b21f24] px-4 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#c2252a] 2xl:px-5"
           >
-            Start a Project
+            {content.navigation.start}
           </Link>
         </div>
 
         <button
           type="button"
-          aria-label="Toggle menu"
+          aria-label={content.navigation.menu}
           aria-expanded={mobileOpen}
           aria-controls="mobile-navigation"
           onClick={() => setMobileOpen((value) => !value)}
@@ -122,17 +159,31 @@ export default function SiteHeader() {
                 {link.label}
               </Link>
             ))}
-            {secondaryLinks.map((link) => (
-              <Link key={link.label} href={link.href} onClick={() => setMobileOpen(false)} className="flex min-h-11 items-center text-[#f0d8d9]">
-                {link.label}
-              </Link>
-            ))}
+            <Link href={localizedPath(activeLocale, "configure")} onClick={() => setMobileOpen(false)} className="flex min-h-11 items-center text-[#f0d8d9]">
+              {content.navigation.configurator}
+            </Link>
+            {locale ? (
+              <div className="my-3 flex flex-wrap gap-2 border-y border-white/8 py-3" aria-label={content.navigation.language}>
+                {locales.map((item) => (
+                  <Link
+                    key={item}
+                    href={localizedPath(item, page)}
+                    hrefLang={item}
+                    aria-current={item === activeLocale ? "page" : undefined}
+                    onClick={() => window.localStorage.setItem("novertra-locale", item)}
+                    className={`grid min-h-11 min-w-11 place-items-center rounded-xl border text-xs font-semibold ${item === activeLocale ? "border-white/20 bg-white/10 text-white" : "border-white/8 text-[#9da69f]"}`}
+                  >
+                    {localeLabels[item]}
+                  </Link>
+                ))}
+              </div>
+            ) : null}
             <Link
-              href="/#start-project"
+              href={`${basePath}#start-project`}
               onClick={() => setMobileOpen(false)}
               className="mt-2 inline-flex w-full items-center justify-center rounded-full bg-[#b21f24] px-5 py-3 font-semibold text-white"
             >
-              Start a Project
+              {content.navigation.start}
             </Link>
           </nav>
         </div>

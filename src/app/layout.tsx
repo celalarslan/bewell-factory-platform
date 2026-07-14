@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
+import { isLocale, localeDirection } from "@/i18n/locales";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -19,9 +21,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const requestHeaders = await headers();
+  const requestedLocale = requestHeaders.get("x-novertra-locale") ?? "en";
+  const locale = isLocale(requestedLocale) ? requestedLocale : "en";
   return (
-    <html lang="en">
+    <html lang={locale} dir={localeDirection(locale)}>
       <body>{children}</body>
     </html>
   );

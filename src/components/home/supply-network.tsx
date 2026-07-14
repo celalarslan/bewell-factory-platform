@@ -1,22 +1,22 @@
-import { supplyClaims } from "@/data/home";
+import type { PublicContent } from "@/i18n/public-content";
 import Reveal from "@/components/ui/reveal";
 import SectionHeading from "@/components/ui/section-heading";
 
-export default function SupplyNetworkSection() {
+export default function SupplyNetworkSection({ content }: { content: PublicContent["supply"] }) {
   return (
     <section id="about" className="border-y border-white/10 bg-[#0a0e12] py-24">
       <div className="mx-auto max-w-[1440px] px-5 lg:px-10">
         <div className="grid gap-12 lg:grid-cols-[.9fr_1.1fr] lg:items-start">
           <div>
             <SectionHeading
-              eyebrow="Türkiye-Africa Supply Network"
-              title="A Connected Industrial Delivery Network"
-              description="Industrial delivery is supported by a practical network of engineering, manufacturing and local execution capability."
+              eyebrow={content.eyebrow}
+              title={content.title}
+              description={content.description}
             />
             <ul className="mt-8 space-y-4 text-base leading-8 text-[#d8dbd7]">
-              {supplyClaims.map((claim) => (
+              {content.claims.map((claim) => (
                 <Reveal key={claim}>
-                  <li className="border-l border-[#b21f24]/60 pl-4">{claim}</li>
+                  <li className="border-s border-[#b21f24]/60 ps-4">{claim}</li>
                 </Reveal>
               ))}
             </ul>
@@ -44,11 +44,11 @@ export default function SupplyNetworkSection() {
                   <circle cx="515" cy="300" r="6" />
                 </g>
               </svg>
-              <div className="absolute left-6 top-6 rounded-full border border-white/12 bg-black/35 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.26em] text-[#f1ebe5]">
-                Regional delivery map
+              <div className="absolute start-6 top-6 rounded-full border border-white/12 bg-black/35 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#f1ebe5]">
+                {content.mapLabel}
               </div>
-              <div className="absolute bottom-6 left-6 right-6 grid gap-3 md:grid-cols-3">
-                {["Türkiye engineering", "Regional sourcing", "African project delivery"].map((item) => (
+              <div className="absolute bottom-6 end-6 start-6 grid gap-3 md:grid-cols-3">
+                {content.mapTags.map((item) => (
                   <div key={item} className="rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-sm text-[#dde0db]">
                     {item}
                   </div>

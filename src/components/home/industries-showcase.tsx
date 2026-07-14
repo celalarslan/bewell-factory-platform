@@ -3,7 +3,8 @@
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { useMemo, useState } from "react";
-import { industries } from "@/data/home";
+import { industryAssets } from "@/data/home";
+import type { PublicContent } from "@/i18n/public-content";
 import Reveal from "@/components/ui/reveal";
 import SectionHeading from "@/components/ui/section-heading";
 
@@ -25,8 +26,9 @@ function IndustryDetailGroup({ title, items }: { title: string; items: string[] 
   );
 }
 
-export default function IndustriesShowcase() {
-  const initial = useMemo(() => industries[0], []);
+export default function IndustriesShowcase({ content }: { content: PublicContent["industries"] }) {
+  const industries = content.items;
+  const initial = useMemo(() => industries[0], [industries]);
   const [activeKey, setActiveKey] = useState(initial.key);
 
   const active = industries.find((industry) => industry.key === activeKey) ?? initial;
@@ -35,8 +37,8 @@ export default function IndustriesShowcase() {
     <section id="industries" className="border-y border-white/10 bg-[#090c10] py-24">
       <div className="mx-auto max-w-[1440px] px-5 lg:px-10">
         <SectionHeading
-          eyebrow="Industries We Build"
-          title="Integrated industrial systems designed around local needs, supply chains and long-term operating capability."
+          eyebrow={content.eyebrow}
+          title={content.title}
         />
 
         <div className="mt-14 grid gap-6 lg:grid-cols-[.9fr_1.1fr]">
@@ -48,7 +50,7 @@ export default function IndustriesShowcase() {
                   <button
                     type="button"
                     onClick={() => setActiveKey(industry.key)}
-                    className={`group w-full rounded-[22px] border px-5 py-4 text-left transition duration-300 ${
+                    className={`group w-full rounded-[22px] border px-5 py-4 text-start transition duration-300 ${
                       isActive
                         ? "border-[#b21f24]/55 bg-white/[0.06]"
                         : "border-white/10 bg-white/[0.025] hover:border-white/20 hover:bg-white/[0.04]"
@@ -61,7 +63,7 @@ export default function IndustriesShowcase() {
                         </div>
                         <div className="mt-2 text-xl font-semibold tracking-[-0.03em] text-white">{industry.title}</div>
                       </div>
-                      <ArrowUpRight className={`mt-1 h-4 w-4 ${isActive ? "text-[#d8d0c8]" : "text-[#77817a]"}`} />
+                      <ArrowUpRight className={`directional-icon mt-1 h-4 w-4 ${isActive ? "text-[#d8d0c8]" : "text-[#77817a]"}`} />
                     </div>
                     <p className="mt-3 line-clamp-2 max-w-xl text-sm leading-6 text-[#9aa59d]">{industry.description}</p>
                   </button>
@@ -72,17 +74,17 @@ export default function IndustriesShowcase() {
 
           <Reveal className="relative min-h-[760px] overflow-hidden rounded-[30px] border border-white/10 bg-[#0a0e12]">
             <div className="absolute inset-0">
-              {active.image ? (
+              {industryAssets[active.key]?.image ? (
                 <>
                   <Image
                     key={active.key}
-                    src={active.image}
+                    src={industryAssets[active.key].image}
                     alt={active.title}
                     fill
                     loading="lazy"
                     sizes="(min-width: 1024px) 56vw, 100vw"
                     className="object-cover transition-opacity duration-700"
-                    style={{ objectPosition: active.imagePosition ?? "center center" }}
+                    style={{ objectPosition: industryAssets[active.key].imagePosition ?? "center center" }}
                   />
                   <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,11,15,0.56)_0%,rgba(8,11,15,0.76)_38%,rgba(8,11,15,0.97)_100%)]" />
                 </>
@@ -108,16 +110,16 @@ export default function IndustriesShowcase() {
                   href="#start-project"
                   className="mt-7 inline-flex items-center gap-2 rounded-full border border-white/14 bg-white/[0.05] px-5 py-3 text-sm font-medium text-white transition hover:bg-white/[0.09]"
                 >
-                  Explore Capability
-                  <ArrowUpRight className="h-4 w-4" />
+                  {content.cta}
+                  <ArrowUpRight className="directional-icon h-4 w-4" />
                 </a>
               </div>
 
               <div className="mt-10 border-t border-white/20 pt-6">
                 <div className="grid xl:grid-cols-3">
-                  <IndustryDetailGroup title="What We Develop" items={active.developmentAreas} />
-                  <IndustryDetailGroup title="Typical Delivery Scope" items={active.deliveryScope} />
-                  <IndustryDetailGroup title="Suitable Project Models" items={active.projectModels} />
+                  <IndustryDetailGroup title={content.development} items={active.developmentAreas} />
+                  <IndustryDetailGroup title={content.scope} items={active.deliveryScope} />
+                  <IndustryDetailGroup title={content.models} items={active.projectModels} />
                 </div>
               </div>
             </div>

@@ -39,3 +39,16 @@ APPROVED
 
 Date:
 2026-07-12
+
+## Completed Milestones
+
+Milestone:
+The Novertra public platform supports English, Arabic, French, and Turkish through
+localized URLs, with Arabic RTL layout, localized configurator content, language
+switching, and multilingual SEO metadata.
+
+Status:
+COMPLETED
+
+Date:
+2026-07-14
