@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: public.ecr.aws/docker/library/postgres:16-alpine
+    environment:
+      POSTGRES_DB: novertra
+      POSTGRES_USER: novertra
+      POSTGRES_PASSWORD: novertra_local
+    ports:
+      - "5432:5432"
+    volumes:
+      - novertra_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U novertra -d novertra"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  novertra_postgres_data:
