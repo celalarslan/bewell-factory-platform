@@ -121,12 +121,23 @@ Status: Verified from the current codebase.
 
 ## 5. API/backend
 
-- No API route files were found under `src/app`.
-- No backend service code was found in this repository.
+- `/api/project-office` provides the local-only Project Office analysis backend.
+- `/api/projects` and `/api/projects/:id` provide local-development CRUD for the
+  `projects` table only.
+- Project creation, update, and archival write an audit event in the same database
+  transaction.
+- Project deletion is implemented as archival; no project delete endpoint issues a
+  SQL `DELETE`.
+- Project APIs fail closed with `404` in production because authentication is not yet
+  available.
 
 ## 6. Database
 
-- No database client, schema, migration, or query layer was found.
+- PostgreSQL is configured for local development through Docker Compose.
+- Drizzle provides the database client, schema, migration, and type layer.
+- The Project Dossier schema contains projects, facts, assumptions, evidence
+  requirements, risks, executive decisions, analysis runs, and audit events.
+- Only the `projects` table and its audit events are currently connected to CRUD APIs.
 
 ## 7. Auth
 
@@ -138,7 +149,8 @@ Status: Verified from the current codebase.
 
 ## 9. Environment variable names
 
-- Doğrulanamadı: no `process.env` or `NEXT_PUBLIC_` usage was found in the application source.
+- `DATABASE_URL` configures the server-only PostgreSQL connection.
+- OpenAI credentials remain server-only; no `NEXT_PUBLIC_` credential is used.
 
 ## 10. Working features
 
@@ -148,6 +160,7 @@ Status: Verified from the current codebase.
 - Internal Project Office demo route.
 - Frontend-only project inquiry form with validation state.
 - Responsive navigation with mobile menu.
+- Local-only Project Dossier project CRUD with transactional audit events and archival.
 
 ## 11. Partial or broken features
 
@@ -155,6 +168,8 @@ Status: Verified from the current codebase.
 - The inquiry form is frontend-only and does not submit to a backend.
 - The Project Office is a demo environment, not a live operational system.
 - The configurator produces indicative, preliminary results and does not create a real project record.
+- Facts, risks, decisions, and the remaining Project Dossier tables do not yet expose CRUD APIs.
+- Project CRUD is not connected to the UI and remains unavailable in production until authentication exists.
 
 ## 12. Current tests
 
