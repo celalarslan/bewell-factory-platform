@@ -26,6 +26,7 @@ import {
   type ProjectRecord,
   updateProject,
 } from "@/lib/projects/client";
+import ProjectDossierModules from "@/components/project-dossier-modules";
 
 type ProjectDossierPanelProps = {
   historyVersion: number;
@@ -521,6 +522,8 @@ export default function ProjectDossierPanel({
                   {activeProject.description ?? "Açıklama eklenmedi."}
                 </p>
               </div>
+
+              <ProjectDossierModules projectId={activeProject.id} />
 
               <div className="mt-5 rounded-2xl border border-white/7 bg-white/[0.018] p-4 md:p-5">
                 <div className="flex items-center justify-between gap-3">

@@ -167,6 +167,12 @@ Status: Verified from the current codebase.
   the server validates the project and builds AI context from PostgreSQL.
 - Successful and failed AI analysis runs are stored in `analysis_runs`, and compact
   project-specific analysis history is shown in the local Project Office UI.
+- Project Dossier V2 provides local-only create, list, update, and safe terminal-state
+  management for facts, assumptions, risks, and evidence requirements.
+- Executive decisions provide local-only create, list, and update operations; removal
+  is disabled because the existing schema has no safe soft-delete field.
+- Every Project Dossier V2 write creates a transaction-bound audit event containing
+  changed field names and a short safe summary.
 
 ## 11. Partial or broken features
 
@@ -174,9 +180,8 @@ Status: Verified from the current codebase.
 - The inquiry form is frontend-only and does not submit to a backend.
 - The Project Office is a demo environment, not a live operational system.
 - The configurator produces indicative, preliminary results and does not create a real project record.
-- Facts, risks, decisions, and the remaining Project Dossier tables do not yet expose CRUD APIs.
-- Only projects are connected to the Project Office UI; facts, assumptions, risks,
-  decisions, and evidence remain disconnected.
+- Project Dossier V2 endpoints and UI remain local-only until production authentication
+  is implemented.
 - Analysis results do not automatically create facts, assumptions, risks, decisions,
   or evidence records.
 - Project Office and Project CRUD remain unavailable in production until authentication

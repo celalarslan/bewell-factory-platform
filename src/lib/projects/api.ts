@@ -36,6 +36,8 @@ type ProjectPatch = Partial<ProjectInput>;
 type ProjectApiErrorCode =
   | "VALIDATION_ERROR"
   | "NOT_FOUND"
+  | "PROJECT_ARCHIVED"
+  | "METHOD_NOT_SUPPORTED"
   | "DATABASE_UNAVAILABLE"
   | "DATABASE_ERROR"
   | "INTERNAL_ERROR";
@@ -51,11 +53,14 @@ export class ProjectApiError extends Error {
   }
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
+export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function assertKnownFields(value: Record<string, unknown>, allowedFields: Set<string>) {
+export function assertKnownFields(
+  value: Record<string, unknown>,
+  allowedFields: Set<string>,
+) {
   const unknownFields = Object.keys(value).filter((field) => !allowedFields.has(field));
   if (unknownFields.length > 0) {
     throw new ProjectApiError(
@@ -66,7 +71,7 @@ function assertKnownFields(value: Record<string, unknown>, allowedFields: Set<st
   }
 }
 
-function requiredString(value: unknown, field: string, maxLength: number) {
+export function requiredString(value: unknown, field: string, maxLength: number) {
   if (typeof value !== "string") {
     throw new ProjectApiError("VALIDATION_ERROR", `${field} must be a string.`, 400);
   }
@@ -85,7 +90,7 @@ function requiredString(value: unknown, field: string, maxLength: number) {
   return normalized;
 }
 
-function optionalString(value: unknown, field: string, maxLength: number) {
+export function optionalString(value: unknown, field: string, maxLength: number) {
   if (value === undefined || value === null) return null;
   if (typeof value !== "string") {
     throw new ProjectApiError("VALIDATION_ERROR", `${field} must be a string.`, 400);
@@ -180,11 +185,23 @@ export function parseProjectPatch(value: unknown): ProjectPatch {
   return patch;
 }
 
-export function assertProjectId(id: string) {
+function assertUuid(id: string, field: string) {
   if (!UUID_PATTERN.test(id)) {
-    throw new ProjectApiError("VALIDATION_ERROR", "Project id must be a valid UUID.", 400);
+    throw new ProjectApiError(
+      "VALIDATION_ERROR",
+      `${field} must be a valid UUID.`,
+      400,
+    );
   }
   return id;
+}
+
+export function assertProjectId(id: string) {
+  return assertUuid(id, "Project id");
+}
+
+export function assertItemId(id: string) {
+  return assertUuid(id, "Item id");
 }
 
 export function assertProjectApiAccess(request: NextRequest) {
