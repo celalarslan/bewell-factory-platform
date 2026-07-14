@@ -14,7 +14,6 @@ import {
   ChevronRight,
   CircleDollarSign,
   ClipboardCheck,
-  Clock3,
   Database,
   Eye,
   FileSearch,
@@ -40,6 +39,7 @@ import type {
   SpecialistResult,
   SupportedLanguage,
 } from "@/lib/ai/types";
+import ProjectDossierPanel from "@/components/project-dossier-panel";
 
 type Agent = {
   id: string;
@@ -218,16 +218,6 @@ const initialDecisions: Decision[] = [
     status: "pending",
   },
 ];
-
-const dossierItems = [
-  ["Karar verici", "Doğrulandı · Kamu bağlantılı sponsor", "complete"],
-  ["Arazi kanıtı", "18.400 m² tahsis yazısı yüklendi", "complete"],
-  ["Hammadde", "Sorgum ve mısır hacimleri inceleniyor", "review"],
-  ["Enerji", "Şebeke profili eksik · hibrit model önerildi", "warning"],
-  ["Alım", "Üç kanatlı üreticisi belirlendi", "review"],
-  ["Finansman", "Sponsor özkaynak kanıtı talep edildi", "warning"],
-  ["Geliştirme yetkisi", "Taslak hukuki incelemede", "review"],
-] as const;
 
 const activity = [
   ["Ticari İstihbarat", "Uganda'dan yeni bir süt işleme fırsatını nitelendirdi", "8 dk"],
@@ -1020,73 +1010,7 @@ export default function AICompanyOS() {
                 </div>
               )}
 
-              {activeTab === "dossier" && (
-                <div>
-                  <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-                    <div>
-                      <div className="text-xs uppercase tracking-[0.2em] text-[#6d8074]">Tek doğruluk kaynağı</div>
-                      <h3 className="mt-2 text-2xl font-semibold text-white md:text-3xl">Proje Dosyası · BFS-2026-0217</h3>
-                    </div>
-                    <span className="self-start rounded-full border border-[#d9bd72]/18 bg-[#d9bd72]/7 px-3 py-1.5 text-[10px] font-medium text-[#dcc57f]">Aşama 3 · Geliştirme</span>
-                  </div>
-
-                  <div className="mt-7 grid gap-5 xl:grid-cols-[1.1fr_.9fr]">
-                    <div className="rounded-[24px] border border-white/8 bg-black/10 p-5 md:p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="text-sm font-semibold text-white">Kanıt kaydı</div>
-                          <div className="mt-1 text-[10px] text-[#67796e]">Her birim aynı yapılandırılmış kayıt üzerinden okur ve yazar.</div>
-                        </div>
-                        <Database className="h-5 w-5 text-[#79cba5]" />
-                      </div>
-                      <div className="mt-5 space-y-2">
-                        {dossierItems.map(([label, value, state]) => (
-                          <div key={label} className="grid gap-3 rounded-2xl border border-white/7 bg-white/[0.018] p-4 md:grid-cols-[150px_1fr_auto] md:items-center">
-                            <div className="text-xs font-medium text-[#aebbb3]">{label}</div>
-                            <div className="text-xs leading-5 text-[#74867a]">{value}</div>
-                            <div className={`flex h-7 w-7 items-center justify-center rounded-full ${
-                              state === "complete" ? "bg-[#74cba2]/10 text-[#82d4b0]" : state === "review" ? "bg-[#d9bd72]/9 text-[#d9bd72]" : "bg-[#d47d72]/9 text-[#d9958c]"
-                            }`}>
-                              {state === "complete" ? <Check className="h-3.5 w-3.5" /> : state === "review" ? <Clock3 className="h-3.5 w-3.5" /> : <AlertTriangle className="h-3.5 w-3.5" />}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="space-y-5">
-                      <div className="rounded-[24px] border border-white/8 bg-black/10 p-5 md:p-6">
-                        <div className="text-sm font-semibold text-white">Birim görüş birliği</div>
-                        <div className="mt-5 space-y-4">
-                          {[
-                            ["Teknik", "Koşullu olarak uygulanabilir", 78],
-                            ["Ticari", "Yetki ile cazip", 72],
-                            ["Finansman", "Kanıt eksik", 48],
-                            ["Uyum", "Orta ülke riski", 67],
-                          ].map(([label, value, progress]) => (
-                            <div key={label as string}>
-                              <div className="flex items-center justify-between text-xs">
-                                <span className="text-[#9baaa1]">{label as string}</span>
-                                <span className="text-[#718278]">{value as string}</span>
-                              </div>
-                              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/6">
-                                <div className="h-full rounded-full bg-[#76cba3]" style={{ width: `${progress}%` }} />
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="rounded-[24px] border border-[#d9bd72]/16 bg-[#d9bd72]/5 p-5 md:p-6">
-                        <div className="flex items-center gap-2 text-sm font-semibold text-white"><BadgeCheck className="h-4 w-4 text-[#d9bd72]" /> Önerilen sonraki aşama</div>
-                        <div className="mt-3 text-lg font-semibold text-[#e5cd86]">Ücretli Ön Fizibilite</div>
-                        <p className="mt-3 text-xs leading-5 text-[#a99d78]">Yalnız geliştirme yetkisi, avans ödemesi ve sponsor özkaynak kanıtından sonra ilerletin.</p>
-                        <button onClick={() => setActiveTab("decisions")} className="mt-5 inline-flex items-center gap-2 text-xs font-semibold text-[#e2c97f]">Onay kartını aç <ArrowRight className="h-3.5 w-3.5" /></button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
+              {activeTab === "dossier" && <ProjectDossierPanel />}
             </div>
           </div>
         </div>

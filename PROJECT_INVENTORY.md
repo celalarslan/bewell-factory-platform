@@ -161,6 +161,8 @@ Status: Verified from the current codebase.
 - Frontend-only project inquiry form with validation state.
 - Responsive navigation with mobile menu.
 - Local-only Project Dossier project CRUD with transactional audit events and archival.
+- Project Office UI project creation, listing, selection, update, and archival through
+  the local Project Dossier API.
 
 ## 11. Partial or broken features
 
@@ -169,7 +171,10 @@ Status: Verified from the current codebase.
 - The Project Office is a demo environment, not a live operational system.
 - The configurator produces indicative, preliminary results and does not create a real project record.
 - Facts, risks, decisions, and the remaining Project Dossier tables do not yet expose CRUD APIs.
-- Project CRUD is not connected to the UI and remains unavailable in production until authentication exists.
+- Only projects are connected to the Project Office UI; facts, assumptions, risks,
+  decisions, and evidence remain disconnected.
+- Project Office and Project CRUD remain unavailable in production until authentication
+  exists, and archival is used instead of real deletion.
 
 ## 12. Current tests
 
