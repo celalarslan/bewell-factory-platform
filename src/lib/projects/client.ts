@@ -35,12 +35,28 @@ export type ProjectInput = {
   status: WritableProjectStatus;
 };
 
+export type AnalysisRunSummary = {
+  id: string;
+  mode: "single" | "review-panel";
+  specialist: string;
+  language: "tr" | "en" | "ar";
+  status: "pending" | "running" | "completed" | "failed";
+  model: string | null;
+  requestSummary: string | null;
+  resultSummary: string | null;
+  createdAt: string;
+  completedAt: string | null;
+};
+
 const errorMessages: Record<string, string> = {
   VALIDATION_ERROR: "Proje bilgilerini kontrol edin.",
   NOT_FOUND: "Proje bulunamadı veya artık mevcut değil.",
   DATABASE_UNAVAILABLE: "Yerel proje veritabanına ulaşılamıyor.",
   DATABASE_ERROR: "Proje bilgileri işlenirken bir veritabanı hatası oluştu.",
   INTERNAL_ERROR: "Beklenmeyen bir hata oluştu.",
+  PROJECT_NOT_FOUND: "Seçili proje bulunamadı.",
+  PROJECT_ARCHIVED: "Arşivlenmiş bir proje için yeni analiz başlatılamaz.",
+  ANALYSIS_NOT_SAVED: "Analiz sonucu proje geçmişine kaydedilemedi.",
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -55,6 +71,18 @@ function isProjectRecord(value: unknown): value is ProjectRecord {
     typeof value.status === "string" &&
     typeof value.createdAt === "string" &&
     typeof value.updatedAt === "string"
+  );
+}
+
+function isAnalysisRunSummary(value: unknown): value is AnalysisRunSummary {
+  return (
+    isRecord(value) &&
+    typeof value.id === "string" &&
+    typeof value.mode === "string" &&
+    typeof value.specialist === "string" &&
+    typeof value.language === "string" &&
+    typeof value.status === "string" &&
+    typeof value.createdAt === "string"
   );
 }
 
@@ -123,4 +151,17 @@ export async function archiveProject(id: string) {
   });
   if (!isProjectRecord(payload.project)) throw new Error(errorMessages.INTERNAL_ERROR);
   return payload.project;
+}
+
+export async function listProjectAnalysisRuns(id: string) {
+  const payload = await projectRequest(
+    `/api/projects/${encodeURIComponent(id)}/analysis-runs`,
+  );
+  if (
+    !Array.isArray(payload.analysisRuns) ||
+    !payload.analysisRuns.every(isAnalysisRunSummary)
+  ) {
+    throw new Error(errorMessages.INTERNAL_ERROR);
+  }
+  return payload.analysisRuns;
 }

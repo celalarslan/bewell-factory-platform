@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   FilePlus2,
   FolderOpen,
+  History,
   LoaderCircle,
   Pencil,
   Save,
@@ -18,11 +19,18 @@ import {
   createProject,
   getProject,
   listProjects,
+  listProjectAnalysisRuns,
   PROJECT_STATUS_OPTIONS,
   type ProjectInput,
+  type AnalysisRunSummary,
   type ProjectRecord,
   updateProject,
 } from "@/lib/projects/client";
+
+type ProjectDossierPanelProps = {
+  historyVersion: number;
+  onActiveProjectChange: (project: ProjectRecord | null) => void;
+};
 
 const emptyForm: ProjectInput = {
   name: "",
@@ -34,6 +42,28 @@ const emptyForm: ProjectInput = {
 };
 
 const statusLabels = Object.fromEntries(PROJECT_STATUS_OPTIONS) as Record<string, string>;
+const runStatusLabels: Record<AnalysisRunSummary["status"], string> = {
+  pending: "Bekliyor",
+  running: "Çalışıyor",
+  completed: "Tamamlandı",
+  failed: "Başarısız",
+};
+const languageLabels: Record<AnalysisRunSummary["language"], string> = {
+  tr: "Türkçe",
+  en: "English",
+  ar: "العربية",
+};
+const specialistLabels: Record<string, string> = {
+  "project-coordination": "Proje Koordinasyonu",
+  "technical-review": "Teknik İnceleme",
+  "project-management": "Proje Yönetimi / PMO",
+  procurement: "Satın Alma",
+  finance: "Finansman",
+  "contract-compliance": "Sözleşme ve Uyum",
+  "proposal-cost": "Teklif ve Maliyet",
+  "commercial-intelligence": "Ticari İstihbarat",
+  "independent-review": "Bağımsız İnceleme",
+};
 const fieldClassName =
   "min-h-11 w-full rounded-xl border border-white/10 bg-[#07100c] px-3.5 py-3 text-sm text-white outline-none transition placeholder:text-[#52645a] focus:border-[#d9bd72]/45 focus:ring-2 focus:ring-[#d9bd72]/10 disabled:cursor-not-allowed disabled:opacity-60";
 
@@ -58,7 +88,10 @@ function safeMessage(error: unknown) {
   return error instanceof Error ? error.message : "Beklenmeyen bir hata oluştu.";
 }
 
-export default function ProjectDossierPanel() {
+export default function ProjectDossierPanel({
+  historyVersion,
+  onActiveProjectChange,
+}: ProjectDossierPanelProps) {
   const [projects, setProjects] = useState<ProjectRecord[]>([]);
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const [activeProject, setActiveProject] = useState<ProjectRecord | null>(null);
@@ -70,7 +103,10 @@ export default function ProjectDossierPanel() {
   const [archiving, setArchiving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [feedback, setFeedback] = useState("");
+  const [analysisHistory, setAnalysisHistory] = useState<AnalysisRunSummary[]>([]);
+  const [historyError, setHistoryError] = useState("");
   const selectionRequest = useRef(0);
+  const historyRequest = useRef(0);
 
   const selectProject = useCallback(async (id: string) => {
     const requestId = ++selectionRequest.current;
@@ -84,14 +120,16 @@ export default function ProjectDossierPanel() {
       const project = await getProject(id);
       if (selectionRequest.current !== requestId) return;
       setActiveProject(project);
+      onActiveProjectChange(project);
     } catch (error) {
       if (selectionRequest.current !== requestId) return;
       setActiveProject(null);
+      onActiveProjectChange(null);
       setErrorMessage(safeMessage(error));
     } finally {
       if (selectionRequest.current === requestId) setLoadingProject(false);
     }
-  }, []);
+  }, [onActiveProjectChange]);
 
   useEffect(() => {
     let cancelled = false;
@@ -105,10 +143,12 @@ export default function ProjectDossierPanel() {
         setProjects(projectList);
         if (projectList[0]) {
           setActiveProject(projectList[0]);
+          onActiveProjectChange(projectList[0]);
           void selectProject(projectList[0].id);
         } else {
           setActiveProjectId(null);
           setActiveProject(null);
+          onActiveProjectChange(null);
         }
       } catch (error) {
         if (!cancelled) setErrorMessage(safeMessage(error));
@@ -121,8 +161,33 @@ export default function ProjectDossierPanel() {
     return () => {
       cancelled = true;
       selectionRequest.current += 1;
+      historyRequest.current += 1;
     };
-  }, [selectProject]);
+  }, [onActiveProjectChange, selectProject]);
+
+  useEffect(() => {
+    if (!activeProjectId) return;
+    const projectId = activeProjectId;
+    const requestId = ++historyRequest.current;
+
+    async function loadHistory() {
+      try {
+        const runs = await listProjectAnalysisRuns(projectId);
+        if (historyRequest.current !== requestId) return;
+        setAnalysisHistory(runs);
+        setHistoryError("");
+      } catch (error) {
+        if (historyRequest.current !== requestId) return;
+        setAnalysisHistory([]);
+        setHistoryError(safeMessage(error));
+      }
+    }
+
+    void loadHistory();
+    return () => {
+      historyRequest.current += 1;
+    };
+  }, [activeProjectId, historyVersion]);
 
   const startCreate = () => {
     selectionRequest.current += 1;
@@ -171,6 +236,7 @@ export default function ProjectDossierPanel() {
       );
       setActiveProjectId(savedProject.id);
       setActiveProject(savedProject);
+      onActiveProjectChange(savedProject);
       setMode("view");
       setForm(emptyForm);
       setFeedback(mode === "edit" ? "Proje güncellendi." : "Yeni proje oluşturuldu.");
@@ -201,10 +267,15 @@ export default function ProjectDossierPanel() {
       if (remainingProjects[0]) {
         setActiveProjectId(remainingProjects[0].id);
         setActiveProject(remainingProjects[0]);
+        onActiveProjectChange(remainingProjects[0]);
         void selectProject(remainingProjects[0].id);
       } else {
         setActiveProjectId(null);
         setActiveProject(null);
+        historyRequest.current += 1;
+        setAnalysisHistory([]);
+        setHistoryError("");
+        onActiveProjectChange(null);
       }
       setFeedback("Proje arşivlendi.");
     } catch (error) {
@@ -449,6 +520,53 @@ export default function ProjectDossierPanel() {
                 <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-[#b4c0b8]">
                   {activeProject.description ?? "Açıklama eklenmedi."}
                 </p>
+              </div>
+
+              <div className="mt-5 rounded-2xl border border-white/7 bg-white/[0.018] p-4 md:p-5">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="flex items-center gap-2 text-sm font-semibold text-white">
+                      <History className="h-4 w-4 text-[#d9bd72]" /> Analiz Geçmişi
+                    </div>
+                    <div className="mt-1 text-[10px] text-[#67796e]">En yeni çalışmalar önce gösterilir.</div>
+                  </div>
+                </div>
+
+                {historyError ? (
+                  <p role="alert" className="mt-4 text-xs leading-5 text-[#df9a91]">{historyError}</p>
+                ) : analysisHistory.length === 0 ? (
+                  <p className="mt-4 text-xs text-[#718278]">Bu proje için henüz kayıtlı analiz yok.</p>
+                ) : (
+                  <div className="mt-4 space-y-2.5">
+                    {analysisHistory.map((run) => (
+                      <div key={run.id} className="rounded-xl border border-white/7 bg-black/10 p-3.5">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                          <div className="min-w-0">
+                            <div className="text-xs font-medium text-[#b6c2ba]">
+                              {run.mode === "review-panel" ? "İnceleme Kurulu" : (specialistLabels[run.specialist] ?? run.specialist)}
+                            </div>
+                            <p className="mt-1.5 line-clamp-2 break-words text-[11px] leading-5 text-[#718278]">
+                              {run.requestSummary ?? "Görev özeti bulunmuyor."}
+                            </p>
+                          </div>
+                          <span className={`self-start rounded-full border px-2.5 py-1 text-[9px] font-medium ${
+                            run.status === "completed"
+                              ? "border-[#74cba2]/18 bg-[#74cba2]/7 text-[#8bd9b8]"
+                              : run.status === "failed"
+                                ? "border-[#d47d72]/18 bg-[#d47d72]/7 text-[#df9a91]"
+                                : "border-[#d9bd72]/18 bg-[#d9bd72]/7 text-[#dcc57f]"
+                          }`}>
+                            {runStatusLabels[run.status]}
+                          </span>
+                        </div>
+                        <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 border-t border-white/6 pt-2.5 text-[9px] text-[#5f7166]">
+                          <span>{new Date(run.createdAt).toLocaleString("tr-TR")}</span>
+                          <span>{languageLabels[run.language]}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="mt-5 flex flex-col gap-3 border-t border-white/8 pt-5 sm:flex-row sm:items-center sm:justify-between">

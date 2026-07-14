@@ -40,6 +40,7 @@ import type {
   SupportedLanguage,
 } from "@/lib/ai/types";
 import ProjectDossierPanel from "@/components/project-dossier-panel";
+import type { ProjectRecord } from "@/lib/projects/client";
 
 type Agent = {
   id: string;
@@ -270,6 +271,7 @@ type WorkspaceStatus = "idle" | "loading" | "success" | "error";
 type ApiSuccess = {
   ok: true;
   specialist: SpecialistId;
+  analysisRunId: string;
   result: SpecialistResult;
 };
 
@@ -292,6 +294,7 @@ function isApiSuccess(value: unknown): value is ApiSuccess {
   const result = value.result;
   return (
     typeof value.specialist === "string" &&
+    typeof value.analysisRunId === "string" &&
     allowedSpecialists.has(value.specialist as SpecialistId) &&
     typeof result.summary === "string" &&
     isStringArray(result.analysis) &&
@@ -345,7 +348,13 @@ function ResultList({ title, items }: { title: string; items: string[] }) {
   );
 }
 
-function SpecialistWorkspace() {
+function SpecialistWorkspace({
+  activeProject,
+  onAnalysisCompleted,
+}: {
+  activeProject: ProjectRecord | null;
+  onAnalysisCompleted: () => void;
+}) {
   const [mode, setMode] = useState<ProjectOfficeMode>("single");
   const [specialistId, setSpecialistId] =
     useState<SpecialistId>("project-coordination");
@@ -364,6 +373,9 @@ function SpecialistWorkspace() {
     .filter(Boolean);
 
   const validate = () => {
+    if (!activeProject) {
+      return "AI görevi başlatmadan önce bir proje dosyası seçin.";
+    }
     if (!allowedModes.has(mode) || !allowedSpecialists.has(specialistId)) {
       return "Geçerli bir çalışma modu ve uzman seçin.";
     }
@@ -401,6 +413,7 @@ function SpecialistWorkspace() {
       setErrorMessage(validationError);
       return;
     }
+    if (!activeProject) return;
 
     requestInFlight.current = true;
     setStatus("loading");
@@ -412,6 +425,7 @@ function SpecialistWorkspace() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          projectId: activeProject.id,
           mode,
           specialistId,
           projectContext: projectContext.trim(),
@@ -428,6 +442,7 @@ function SpecialistWorkspace() {
 
       setResult(payload.result);
       setStatus("success");
+      onAnalysisCompleted();
     } catch (error) {
       setStatus("error");
       setErrorMessage(
@@ -453,7 +468,7 @@ function SpecialistWorkspace() {
           </p>
         </div>
         <span className="self-start rounded-full border border-[#74cba2]/18 bg-[#74cba2]/8 px-3 py-1.5 text-[10px] font-medium uppercase tracking-[0.12em] text-[#8bd9b8]">
-          Yalnız dahili kullanım
+          {activeProject ? `Aktif proje · ${activeProject.name}` : "Aktif proje seçilmedi"}
         </span>
       </div>
 
@@ -691,6 +706,8 @@ export default function AICompanyOS() {
   const [activeTab, setActiveTab] = useState<"command" | "team" | "decisions" | "dossier">("command");
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [decisions, setDecisions] = useState<Decision[]>(initialDecisions);
+  const [activeProject, setActiveProject] = useState<ProjectRecord | null>(null);
+  const [historyVersion, setHistoryVersion] = useState(0);
 
   const pendingDecisions = useMemo(
     () => decisions.filter((decision) => decision.status === "pending").length,
@@ -738,7 +755,10 @@ export default function AICompanyOS() {
         </div>
 
         <div className="mt-7 rounded-[30px] border border-white/10 bg-[#06100c] p-5 shadow-2xl shadow-black/30 md:p-7 lg:p-8">
-          <SpecialistWorkspace />
+          <SpecialistWorkspace
+            activeProject={activeProject}
+            onAnalysisCompleted={() => setHistoryVersion((version) => version + 1)}
+          />
         </div>
 
         <div className="mt-8 overflow-hidden rounded-[34px] border border-white/10 bg-[#06100c] shadow-2xl shadow-black/35">
@@ -1010,7 +1030,12 @@ export default function AICompanyOS() {
                 </div>
               )}
 
-              {activeTab === "dossier" && <ProjectDossierPanel />}
+              <div className={activeTab === "dossier" ? "block" : "hidden"}>
+                <ProjectDossierPanel
+                  historyVersion={historyVersion}
+                  onActiveProjectChange={setActiveProject}
+                />
+              </div>
             </div>
           </div>
         </div>

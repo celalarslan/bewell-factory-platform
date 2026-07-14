@@ -13,6 +13,7 @@ const LANGUAGES = new Set<SupportedLanguage>(["en", "tr", "ar"]);
 const SPECIALISTS = new Set<string>(SPECIALIST_IDS);
 const RISK_LEVELS = new Set<RiskLevel>(["low", "medium", "high", "critical"]);
 const REQUEST_FIELDS = new Set([
+  "projectId",
   "mode",
   "specialistId",
   "projectContext",
@@ -20,6 +21,7 @@ const REQUEST_FIELDS = new Set([
   "evidence",
   "language",
 ]);
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 const LIMITS = {
   projectContext: 20_000,
@@ -93,7 +95,12 @@ export function validateProjectOfficeRequest(value: unknown): ProjectOfficeReque
     requiredString(item, `evidence[${index}]`, LIMITS.evidenceItem),
   );
 
+  if (typeof value.projectId !== "string" || !UUID_PATTERN.test(value.projectId)) {
+    invalid("projectId must be a valid UUID.");
+  }
+
   return {
+    projectId: value.projectId,
     mode: mode as ProjectOfficeMode,
     specialistId: value.specialistId as SpecialistId,
     projectContext: requiredString(

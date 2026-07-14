@@ -163,6 +163,10 @@ Status: Verified from the current codebase.
 - Local-only Project Dossier project CRUD with transactional audit events and archival.
 - Project Office UI project creation, listing, selection, update, and archival through
   the local Project Dossier API.
+- The active Project Dossier record is linked to Project Office AI tasks by project ID;
+  the server validates the project and builds AI context from PostgreSQL.
+- Successful and failed AI analysis runs are stored in `analysis_runs`, and compact
+  project-specific analysis history is shown in the local Project Office UI.
 
 ## 11. Partial or broken features
 
@@ -173,6 +177,8 @@ Status: Verified from the current codebase.
 - Facts, risks, decisions, and the remaining Project Dossier tables do not yet expose CRUD APIs.
 - Only projects are connected to the Project Office UI; facts, assumptions, risks,
   decisions, and evidence remain disconnected.
+- Analysis results do not automatically create facts, assumptions, risks, decisions,
+  or evidence records.
 - Project Office and Project CRUD remain unavailable in production until authentication
   exists, and archival is used instead of real deletion.
 

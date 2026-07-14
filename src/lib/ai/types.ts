@@ -26,12 +26,22 @@ export interface SpecialistDefinition {
 }
 
 export interface ProjectOfficeRequest {
+  projectId: string;
   mode: ProjectOfficeMode;
   specialistId: SpecialistId;
   projectContext: string;
   task: string;
   evidence: string[];
   language: SupportedLanguage;
+}
+
+export interface ProjectDossierContext {
+  name: string;
+  country: string | null;
+  sector: string | null;
+  clientOrganization: string | null;
+  description: string | null;
+  status: string;
 }
 
 export interface SpecialistRisk {
@@ -54,6 +64,10 @@ export type ProjectOfficeErrorCode =
   | "INVALID_REQUEST"
   | "INVALID_ORIGIN"
   | "NOT_FOUND"
+  | "PROJECT_NOT_FOUND"
+  | "PROJECT_ARCHIVED"
+  | "DATABASE_UNAVAILABLE"
+  | "ANALYSIS_NOT_SAVED"
   | "PAYLOAD_TOO_LARGE"
   | "SERVER_CONFIGURATION_ERROR"
   | "RATE_LIMITED"
